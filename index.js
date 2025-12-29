@@ -1,5 +1,6 @@
 import { Client, GatewayIntentBits } from "discord.js"
 import OpenAI from "openai"
+import http from "http"
 
 const cliente = new Client({
   intents: [
@@ -23,18 +24,25 @@ cliente.on("messageCreate", async (mensagem) => {
 
   try {
     const resposta = await openai.chat.completions.create({
-      model: "gpt-5-nano",
+      model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "responda curto, direto e como um bot de discord" },
+        { role: "system", content: "responda curto e direto" },
         { role: "user", content: mensagem.content }
       ],
       max_tokens: 60
     })
 
     await mensagem.reply(resposta.choices[0].message.content)
-  } catch (erro) {
-    await mensagem.reply("deu erro aqui 😕")
+  } catch {
+    await mensagem.reply("deu erro 😕")
   }
 })
 
 cliente.login(process.env.DISCORD_BOT_TOKEN)
+
+const servidor = http.createServer((req, res) => {
+  res.writeHead(200)
+  res.end("ok")
+})
+
+servidor.listen(process.env.PORT || 3000)
